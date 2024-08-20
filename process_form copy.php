@@ -1,7 +1,7 @@
 <?php
 // ajax-handler.php
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] != 'POST') {
     // Perform your operations here, e.g., saving data to the database
 
     // Example response

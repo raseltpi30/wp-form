@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="style.css">
     <!-- Include jQuery -->
+    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         .form-section {
@@ -37,6 +38,9 @@
     <div class="container mt-5">
         <div class="row">
             <div class="col-md-12">
+                <h2>form </h2>
+
+                <div id="error-message" style="display:none; color:red;"></div>
                 <form id="customForm" method="POST" action="">
                     <div class="row">
                         <div class="col-md-8">
@@ -210,7 +214,8 @@
     </div>
     <script>
         $(document).ready(function() {
-            $("#customForm").on('submit', function(event) {
+            $("#customForm").on('submit', function(e) {
+                e.preventDefault();
                 var isValid = true;
 
                 // Clear previous errors
@@ -235,6 +240,36 @@
 
                 if (!isValid) {
                     event.preventDefault(); // Prevent form submission
+                } else {
+                    $.ajax({
+                        url: 'process_form.php', // URL to the PHP script
+                        type: 'POST',
+                        data: $(this).serialize(), // Serialize form data
+                        success: function(response) {
+                            // Parse the JSON response
+                            var result = JSON.parse(response);
+
+                            // Check the status and display appropriate message
+                            if (result.status === 'success') {
+                                $('#success-message').text(result.message).show();
+                                $('#error-message').hide(); // Hide error message if shown
+
+                                setTimeout(function() {
+                                    window.location.href = "orders.php";
+                                });
+
+
+                            } else {
+                                $('#error-message').text(result.message).show();
+                                $('#success-message').hide(); // Hide success message if shown
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            // Handle errors
+                            $('#error-message').text('An error occurred: ' + error).show();
+                            $('#success-message').hide();
+                        }
+                    });
                 }
             });
             $('#service_level').on('change', function() {
